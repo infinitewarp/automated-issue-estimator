@@ -2,7 +2,6 @@
 import sys
 import numpy as np
 from utils import get_embedding, load_pickle, cosine_similarity
-from collections import Counter
 
 TOP_K = 5
 
@@ -15,18 +14,22 @@ def main():
 
     vectors = load_pickle("story_vectors.pkl")
     metadata = load_pickle("story_metadata.pkl")
+    clf = load_pickle("classifier.pkl")
+    encoder = load_pickle("label_encoder.pkl")
 
-    new_vec = get_embedding(user_story)
-    similarities = [cosine_similarity(new_vec, v) for v in vectors]
+    emb = get_embedding(user_story)
 
+    # Predict with classifier
+    predicted_index = clf.predict([emb])[0]
+    predicted_label = encoder.inverse_transform([predicted_index])[0]
+
+    # Similarity for context
+    similarities = [cosine_similarity(emb, v) for v in vectors]
     top_indices = np.argsort(similarities)[-TOP_K:][::-1]
-    top_sizes = [metadata[i]["size"] for i in top_indices]
     top_stories = [metadata[i] for i in top_indices]
 
-    predicted_size = Counter(top_sizes).most_common(1)[0][0]
-
-    print(f"Predicted size: {predicted_size}")
-    print("\nSimilar stories:")
+    print(f"Predicted size: {predicted_label}\n")
+    print("Similar stories:")
     for story in top_stories:
         print(f"- [{story['id']}] {story['title']} ({story['size']})")
 
