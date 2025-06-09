@@ -1,0 +1,12 @@
+[project]
+name = "automated-issue-estimator"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11.5"
+dependencies = [
+    "numpy>=2.3.0",
+    "scikit-learn>=1.7.0",
+    "sentence-transformers>=4.1.0",
+    "xgboost>=3.0.2",
+]
