@@ -2,7 +2,8 @@
 import json
 import numpy as np
 from sklearn.datasets import make_classification
-from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.preprocessing import LabelEncoder, StandardScaler
 from sklearn.metrics import classification_report
 from sklearn.linear_model import LogisticRegression
@@ -64,13 +65,38 @@ def main():
     # clf = LogisticRegression(max_iter=1000, C=0.1)  # Try a lower C (stronger regularization) ...but no help.
     # clf = LogisticRegression(max_iter=1000, solver='liblinear')  # ...but liblinear is deprecated
 
+    # solver='saga' produces no warnings, but it any is better?
+    # clf = LogisticRegression(max_iter=1000, solver='saga')
+
     # https://machinelearningmastery.com/one-vs-rest-and-one-vs-one-for-multi-class-classification/
     # https://scikit-learn.org/stable/modules/multiclass.html#ovo-classification
     # https://www.geeksforgeeks.org/understanding-the-predictproba-function-in-scikit-learns-svc/#the-role-of-predict_proba
-    clf = SVC(decision_function_shape='ovo', probability=True)  # works
+    # clf = SVC(decision_function_shape='ovo', probability=True)  # works pretty well!
 
-    # solver='saga' produces no warnings, but it any is better?
-    # clf = LogisticRegression(max_iter=1000, solver='saga')
+
+    # clf = RandomForestClassifier(
+    #     n_estimators=200,       # more trees for stability
+    #     max_depth=None,         # or limit to avoid overfitting
+    #     random_state=42
+    # )  # works pretty well!
+
+    # params = {
+    #     "n_estimators": [100, 200],
+    #     "max_depth": [None, 10, 20],
+    #     "min_samples_split": [2, 5]
+    # }
+    # clf = GridSearchCV(RandomForestClassifier(random_state=42), params, cv=3)
+    # clf.fit(vectors, y)
+    # print("Best params:", clf.best_params_)
+
+    # recommended from best params above
+    clf = RandomForestClassifier(
+        n_estimators=100,
+        max_depth=None,
+        min_samples_split=2,
+        random_state=42
+    )
+
     clf.fit(vectors, y)
 
     # Save all relevant artifacts
