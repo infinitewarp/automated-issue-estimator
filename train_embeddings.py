@@ -4,7 +4,7 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 from sklearn.metrics import classification_report
-from xgboost import XGBClassifier
+from sklearn.linear_model import LogisticRegression
 from utils import get_embedding, save_pickle
 
 DATA_PATH = "stories.json"
@@ -35,20 +35,8 @@ def main():
     encoder = LabelEncoder()
     y = encoder.fit_transform(labels)
 
-    X_train, X_test, y_train, y_test = train_test_split(vectors, y, test_size=0.2, random_state=42)
-
-    clf = XGBClassifier(
-        n_estimators=100,
-        learning_rate=0.1,
-        use_label_encoder=False,
-        eval_metric='mlogloss',
-        random_state=42
-    )
-    clf.fit(X_train, y_train)
-
-    y_pred = clf.predict(X_test)
-    print("\n📊 Classification Report:")
-    print(classification_report(y_test, y_pred, target_names=encoder.classes_))
+    clf = LogisticRegression(max_iter=1000)
+    clf.fit(vectors, y)
 
     # Save all relevant artifacts
     save_pickle(vectors, VEC_OUT)
