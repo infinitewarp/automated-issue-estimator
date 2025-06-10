@@ -32,6 +32,10 @@ def main():
         })
 
     vectors = np.array(vectors)
+
+    if np.any(np.all(vectors == 0, axis=1)):
+        print("⚠️ Warning: Some embeddings are zero vectors!")
+
     encoder = LabelEncoder()
     y = encoder.fit_transform(labels)
 
