@@ -1,4 +1,6 @@
 # utils.py
+from summarize_issue import generate_user_story
+
 import numpy as np
 import pickle
 from sentence_transformers import SentenceTransformer
@@ -31,6 +33,7 @@ def get_embedding(text: str):
     if len(cleaned) < 5:  # Arbitrary length threshold
         print("⚠️ Warning: cleaned text is very short; returning zeros!")
         return np.zeros(size)
+    reinterpreted = generate_user_story(text)
     truncated = cleaned[:max_text_len]  # crude safety cutoff
     try:
 
