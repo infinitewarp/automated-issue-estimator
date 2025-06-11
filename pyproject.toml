@@ -5,6 +5,7 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.11.5"
 dependencies = [
+    "alive-progress>=3.2.0",
     "jira>=3.8.0",
     "numpy>=2.3.0",
     "prompt-toolkit>=3.0.51",

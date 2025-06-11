@@ -1,6 +1,7 @@
 # train_embeddings.py
 import json
 import numpy as np
+from alive_progress import alive_bar
 from sklearn.datasets import make_classification
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split, GridSearchCV
@@ -24,17 +25,20 @@ def train_embeddings():
 
     vectors, labels, metadata = [], [], []
 
-    for story in stories:
-        text = story['title'].strip().rstrip('.?!') + ". " + story['description']
-        emb = get_embedding(text)
-        vectors.append(emb)
-        labels.append(story['size'])
-        metadata.append({
-            "id": story["id"],
-            "title": story["title"],
-            "size": story["size"],
-            "raw": text
-        })
+    with alive_bar(len(stories)) as bar:
+        for story in stories:
+            text = story['title'].strip().rstrip('.?!') + ". " + story['description']
+            emb = get_embedding(text)
+            vectors.append(emb)
+            labels.append(story['size'])
+            metadata.append({
+                "id": story["id"],
+                "title": story["title"],
+                "size": story["size"],
+                "raw": text
+            })
+            bar.text = story['id']
+            bar()
 
     vectors = np.array(vectors)
 
