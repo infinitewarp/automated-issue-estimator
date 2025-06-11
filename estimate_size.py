@@ -5,13 +5,7 @@ from utils import get_embedding, load_pickle, cosine_similarity
 
 TOP_K = 5
 
-def main():
-    if len(sys.argv) < 2:
-        print("Usage: python estimate_size.py '<user story text>'")
-        return
-
-    user_story = sys.argv[1]
-
+def estimate_size(user_story: str):
     vectors = load_pickle("story_vectors.pkl")
     metadata = load_pickle("story_metadata.pkl")
     clf = load_pickle("classifier.pkl")
@@ -35,6 +29,3 @@ def main():
     print("📚 Most similar existing stories:")
     for story in top_stories:
         print(f"- [{story['id']}] {story['title']} (Size: {story['size']})")
-
-if __name__ == "__main__":
-    main()

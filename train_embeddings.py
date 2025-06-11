@@ -18,7 +18,7 @@ META_OUT = "story_metadata.pkl"
 MODEL_OUT = "classifier.pkl"
 LABELS_OUT = "label_encoder.pkl"
 
-def main():
+def train_embeddings():
     with open(DATA_PATH, 'r') as f:
         stories = json.load(f)
 
@@ -106,6 +106,3 @@ def main():
     save_pickle(encoder, LABELS_OUT)
 
     print(f"\n✅ Trained and saved model using {len(vectors)} stories.")
-
-if __name__ == "__main__":
-    main()
