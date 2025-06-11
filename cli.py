@@ -1,26 +1,14 @@
 # cli.py
 import argparse
 import os
-import readline  # unused import magically enhances `input` function
 from estimate_size import estimate_size
 from train_embeddings import train_embeddings
+from predict_repl import predict_repl
 # from update_model import update_model
 
 def predict_once(story_text):
     print()
     estimate_size(story_text)
-
-def predict_repl():
-    print("\n📘 Enter a user story description. Press Ctrl+C to exit.\n")
-    while True:
-        try:
-            text = input("✏️  > ")
-            if text.strip():
-                estimate_size(text)
-                print()
-        except (KeyboardInterrupt, EOFError):
-            print("\n👋 Exiting REPL.")
-            break
 
 def main():
     parser = argparse.ArgumentParser(description="Issue Size Estimator")
