@@ -25,7 +25,7 @@ def train_embeddings():
     vectors, labels, metadata = [], [], []
 
     for story in stories:
-        text = story['title'] + " " + story['description']
+        text = story['title'].strip().rstrip('.?!') + ". " + story['description']
         emb = get_embedding(text)
         vectors.append(emb)
         labels.append(story['size'])
