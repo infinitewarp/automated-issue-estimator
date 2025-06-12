@@ -1,14 +1,24 @@
 # estimate_size.py
-import sys
 import numpy as np
-from utils import get_embedding, load_model, cosine_similarity, VEC_OUT, META_OUT, MODEL_OUT, LABELS_OUT
+from utils import (
+    get_embedding,
+    load_model,
+    cosine_similarity,
+    VEC_OUT,
+    META_OUT,
+    MODEL_OUT,
+    LABELS_OUT,
+)
 
 from alive_progress import alive_bar
 
 TOP_K = 5
 
+
 def estimate_size(user_story: str):
-    with alive_bar(spinner="dots_waves", bar=None, monitor=False, elapsed=False, stats=False):
+    with alive_bar(
+        spinner="dots_waves", bar=None, monitor=False, elapsed=False, stats=False
+    ):
         vectors = load_model(VEC_OUT)
         metadata = load_model(META_OUT)
         clf = load_model(MODEL_OUT)

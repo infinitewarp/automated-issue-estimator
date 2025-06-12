@@ -1,11 +1,13 @@
 # summarize_issue.py
 import requests
 
-HALLUCINATE = False # flip this for expensive story rewriting before embedding
+HALLUCINATE = False  # flip this for expensive story rewriting before embedding
+# HALLUCINATE = True
 
-OLLAMA_MODEL = "gemma3:27b" # 17GB big model
-# OLLAMA_MODEL = "llama3.2:3b" # 2GB small model
+# OLLAMA_MODEL = "gemma3:27b" # 17GB big model
+OLLAMA_MODEL = "llama3.2:3b"  # 2GB small model
 OLLAMA_API_URL = "http://localhost:11434/api/generate"
+
 
 def format_prompt(problem_description):
     return f"""
@@ -22,23 +24,19 @@ Problem description:
 User story:
 """
 
+
 def generate_user_story(problem_description):
     if not HALLUCINATE:
         return problem_description
     prompt = format_prompt(problem_description)
 
-    payload = {
-        "model": OLLAMA_MODEL,
-        "prompt": prompt,
-        "stream": False
-    }
+    payload = {"model": OLLAMA_MODEL, "prompt": prompt, "stream": False}
 
     try:
         response = requests.post(OLLAMA_API_URL, json=payload)
         response.raise_for_status()
         output = response.json()["response"].strip()
         print(f"\n{output}\n")
-        # raise Exception
         return output
     except requests.exceptions.RequestException as e:
         raise Exception(f"Error communicating with Ollama: {e}")

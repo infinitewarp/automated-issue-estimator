@@ -5,14 +5,14 @@ from prompt_toolkit.history import InMemoryHistory
 from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
 
 session = PromptSession(
-    multiline=True,
-    history=InMemoryHistory(),
-    auto_suggest=AutoSuggestFromHistory()
+    multiline=True, history=InMemoryHistory(), auto_suggest=AutoSuggestFromHistory()
 )
 
 
 def predict_repl():
-    print("\n📘 Enter a user story description. Submit with ESCAPE followed by ENTER. Ctrl+C to exit.\n")
+    print(
+        "\n📘 Enter a user story description. Submit with ESCAPE followed by ENTER. Ctrl+C to exit.\n"
+    )
     while True:
         try:
             text = session.prompt(">>> ")

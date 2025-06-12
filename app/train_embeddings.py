@@ -2,102 +2,62 @@
 import json
 import numpy as np
 from alive_progress import alive_bar
-from sklearn.datasets import make_classification
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.model_selection import train_test_split, GridSearchCV
-from sklearn.preprocessing import LabelEncoder, StandardScaler
-from sklearn.metrics import classification_report
-from sklearn.linear_model import LogisticRegression
-from sklearn.multiclass import OneVsRestClassifier
+from sklearn.preprocessing import LabelEncoder
 from utils import get_embedding, save_model, VEC_OUT, META_OUT, MODEL_OUT, LABELS_OUT
-from sklearn.svm import SVC
-import sys
 
 DATA_PATH = "stories.json"
 
+
 def train_embeddings():
-    with open(DATA_PATH, 'r') as f:
+    with open(DATA_PATH, "r") as f:
         stories = json.load(f)
 
     vectors, labels, metadata = [], [], []
 
     with alive_bar(len(stories)) as bar:
         for story in stories:
-            text = story['title'].strip().rstrip('.?!') + ". " + story['description']
+            text = story["title"].strip().rstrip(".?!") + ". " + story["description"]
             emb = get_embedding(text)
             vectors.append(emb)
-            labels.append(story['size'])
-            metadata.append({
-                "id": story["id"],
-                "title": story["title"],
-                "size": story["size"],
-                "raw": text
-            })
-            bar.text = story['id']
+            labels.append(story["size"])
+            metadata.append(
+                {
+                    "id": story["id"],
+                    "title": story["title"],
+                    "size": story["size"],
+                    "raw": text,
+                }
+            )
+            bar.text = story["id"]
             bar()
 
     vectors = np.array(vectors)
 
-    # Attempt to elimintate:
-    # > sklearn/linear_model/_linear_loss.py:203: RuntimeWarning: divide by zero encountered in matmul
-    # >   raw_prediction = X @ weights.T + intercept  # ndarray, likely C-contiguous
-    # and
-    # > sklearn/utils/extmath.py:44: RuntimeWarning: divide by zero encountered in dot
-    # >   return np.dot(x, x)
-
-    # scaler = StandardScaler()
-    # vectors = scaler.fit_transform(vectors)  # Normalize embeddings
-    # ...but that did not help.
-
-    # Diagnose if there are extreme vectors...
-    # print(f"Embedding range: min={np.min(vectors)}, max={np.max(vectors)}")
-    # np.clip(vectors, -10, 10, out=vectors)  # Clipping to a range between -10 and 10
-    # ...but they're all between |5|.
-
     if np.any(np.all(vectors == 0, axis=1)):
-        print("⚠️ Warning: Some embeddings are zero vectors!")
+        print(
+            "⚠️ Warning: Some embeddings are zero vectors and will be excluded from training!"
+        )
+        # Filter out problematic zero vectors for training.
+        # It's unclear when or how this could happen with current training data.
+        non_zero_mask = ~np.all(vectors == 0, axis=1)
+        vectors = vectors[non_zero_mask]
+        labels = [label for i, label in enumerate(labels) if non_zero_mask[i]]
+        metadata = [meta for i, meta in enumerate(metadata) if non_zero_mask[i]]
+        print(
+            f"Removed {len(non_zero_mask) - np.sum(non_zero_mask)} zero-vector stories."
+        )
 
     encoder = LabelEncoder()
     y = encoder.fit_transform(labels)
 
-    # clf = LogisticRegression(max_iter=1000)
-    # clf = LogisticRegression(max_iter=1000, C=1.0)  # Default regularization strength
-    # clf = LogisticRegression(max_iter=1000, C=0.1)  # Try a lower C (stronger regularization) ...but no help.
-    # clf = LogisticRegression(max_iter=1000, solver='liblinear')  # ...but liblinear is deprecated
-
-    # solver='saga' produces no warnings, but it any is better?
-    # clf = LogisticRegression(max_iter=1000, solver='saga')
-
-    # https://machinelearningmastery.com/one-vs-rest-and-one-vs-one-for-multi-class-classification/
-    # https://scikit-learn.org/stable/modules/multiclass.html#ovo-classification
-    # https://www.geeksforgeeks.org/understanding-the-predictproba-function-in-scikit-learns-svc/#the-role-of-predict_proba
-    # clf = SVC(decision_function_shape='ovo', probability=True)  # works pretty well!
-
-
-    # clf = RandomForestClassifier(
-    #     n_estimators=200,       # more trees for stability
-    #     max_depth=None,         # or limit to avoid overfitting
-    #     random_state=42
-    # )  # works pretty well!
-
-    # params = {
-    #     "n_estimators": [100, 200],
-    #     "max_depth": [None, 10, 20],
-    #     "min_samples_split": [2, 5]
-    # }
-    # clf = GridSearchCV(RandomForestClassifier(random_state=42), params, cv=3)
-    # clf.fit(vectors, y)
-    # print("Best params:", clf.best_params_)
-
-    # recommended from best params above
     clf = RandomForestClassifier(
         n_estimators=100,
         max_depth=None,
         min_samples_split=2,
         random_state=42,
-        class_weight='balanced',
+        class_weight="balanced",
     )
-
     clf.fit(vectors, y)
 
     # Save all relevant artifacts
@@ -106,4 +66,6 @@ def train_embeddings():
     save_model(clf, MODEL_OUT)
     save_model(encoder, LABELS_OUT)
 
-    print(f"\n✅ Trained and saved model using {len(vectors)} stories.")
+    print(
+        f"\n✅ Trained and saved model using {len(vectors)} embeddings for {len(stories)} stories."
+    )

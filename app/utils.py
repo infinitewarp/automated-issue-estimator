@@ -6,7 +6,7 @@ import joblib
 from pathlib import Path
 from sentence_transformers import SentenceTransformer
 
-models_dir = Path(__file__).resolve().parent.parent / 'models'
+models_dir = Path(__file__).resolve().parent.parent / "models"
 
 VEC_OUT = "story_vectors.data.gz"
 META_OUT = "story_metadata.data.gz"
@@ -22,6 +22,7 @@ preferred_model = "bge-large"
 
 _model, _size = None, None
 
+
 def get_model():
     global _model
     global _size
@@ -35,9 +36,17 @@ def get_model():
 
 max_text_len = 1024  # arbitrary, but try 512-2048
 
+
 def get_embedding(text: str):
     model, size = get_model()
-    cleaned = text.strip().replace("\r\n", " ").replace("\n", " ").replace("{", "").replace("}", "").replace("**", "")
+    cleaned = (
+        text.strip()
+        .replace("\r\n", " ")
+        .replace("\n", " ")
+        .replace("{", "")
+        .replace("}", "")
+        .replace("**", "")
+    )
     if len(cleaned) < 5:  # Arbitrary length threshold
         print("⚠️ Warning: cleaned text is very short; returning zeros!")
         return np.zeros(size)
@@ -52,11 +61,14 @@ def get_embedding(text: str):
         print("🛑 Embedding error:", e)
         return np.zeros(size)
 
+
 def cosine_similarity(a, b):
     return np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))
 
+
 def save_model(data, filename):
-    joblib.dump(data, models_dir/filename)
+    joblib.dump(data, models_dir / filename)
+
 
 def load_model(filename):
-    return joblib.load(models_dir/filename)
+    return joblib.load(models_dir / filename)

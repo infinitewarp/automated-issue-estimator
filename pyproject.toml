@@ -10,6 +10,7 @@ dependencies = [
     "joblib>=1.5.1",
     "numpy>=2.3.0",
     "prompt-toolkit>=3.0.51",
+    "ruff>=0.11.13",
     "scikit-learn>=1.7.0",
     "sentence-transformers>=4.1.0",
     "xgboost>=3.0.2",
