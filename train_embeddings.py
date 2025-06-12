@@ -98,7 +98,8 @@ def train_embeddings():
         n_estimators=100,
         max_depth=None,
         min_samples_split=2,
-        random_state=42
+        random_state=42,
+        class_weight='balanced',
     )
 
     clf.fit(vectors, y)
