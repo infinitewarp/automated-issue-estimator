@@ -1,7 +1,7 @@
 # estimate_size.py
 import sys
 import numpy as np
-from utils import get_embedding, load_pickle, cosine_similarity
+from utils import get_embedding, load_model, cosine_similarity, VEC_OUT, META_OUT, MODEL_OUT, LABELS_OUT
 
 from alive_progress import alive_bar
 
@@ -9,10 +9,10 @@ TOP_K = 5
 
 def estimate_size(user_story: str):
     with alive_bar(spinner="dots_waves", bar=None, monitor=False, elapsed=False, stats=False):
-        vectors = load_pickle("story_vectors.pkl")
-        metadata = load_pickle("story_metadata.pkl")
-        clf = load_pickle("classifier.pkl")
-        encoder = load_pickle("label_encoder.pkl")
+        vectors = load_model(VEC_OUT)
+        metadata = load_model(META_OUT)
+        clf = load_model(MODEL_OUT)
+        encoder = load_model(LABELS_OUT)
 
         emb = get_embedding(user_story)
 

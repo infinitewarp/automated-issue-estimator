@@ -9,15 +9,11 @@ from sklearn.preprocessing import LabelEncoder, StandardScaler
 from sklearn.metrics import classification_report
 from sklearn.linear_model import LogisticRegression
 from sklearn.multiclass import OneVsRestClassifier
-from utils import get_embedding, save_pickle
+from utils import get_embedding, save_model, VEC_OUT, META_OUT, MODEL_OUT, LABELS_OUT
 from sklearn.svm import SVC
 import sys
 
 DATA_PATH = "stories.json"
-VEC_OUT = "story_vectors.pkl"
-META_OUT = "story_metadata.pkl"
-MODEL_OUT = "classifier.pkl"
-LABELS_OUT = "label_encoder.pkl"
 
 def train_embeddings():
     with open(DATA_PATH, 'r') as f:
@@ -105,9 +101,9 @@ def train_embeddings():
     clf.fit(vectors, y)
 
     # Save all relevant artifacts
-    save_pickle(vectors, VEC_OUT)
-    save_pickle(metadata, META_OUT)
-    save_pickle(clf, MODEL_OUT)
-    save_pickle(encoder, LABELS_OUT)
+    save_model(vectors, VEC_OUT)
+    save_model(metadata, META_OUT)
+    save_model(clf, MODEL_OUT)
+    save_model(encoder, LABELS_OUT)
 
     print(f"\n✅ Trained and saved model using {len(vectors)} stories.")

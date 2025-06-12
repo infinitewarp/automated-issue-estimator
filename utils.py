@@ -2,8 +2,16 @@
 from summarize_issue import generate_user_story
 
 import numpy as np
-import pickle
+import joblib
+from pathlib import Path
 from sentence_transformers import SentenceTransformer
+
+models_dir = Path(__file__).resolve().parent / 'models'
+
+VEC_OUT = "story_vectors.data.gz"
+META_OUT = "story_metadata.data.gz"
+MODEL_OUT = "classifier.data.gz"
+LABELS_OUT = "label_encoder.data.gz"
 
 known_models = {
     "bge-base": ("BAAI/bge-base-en-v1.5", 768),
@@ -48,10 +56,8 @@ def get_embedding(text: str):
 def cosine_similarity(a, b):
     return np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))
 
-def save_pickle(data, filename):
-    with open(filename, 'wb') as f:
-        pickle.dump(data, f)
+def save_model(data, filename):
+    joblib.dump(data, models_dir/filename)
 
-def load_pickle(filename):
-    with open(filename, 'rb') as f:
-        return pickle.load(f)
+def load_model(filename):
+    return joblib.load(models_dir/filename)
