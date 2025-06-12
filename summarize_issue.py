@@ -1,6 +1,8 @@
 # summarize_issue.py
 import requests
 
+HALLUCINATE = False # flip this for expensive story rewriting before embedding
+
 OLLAMA_MODEL = "gemma3:27b" # 17GB big model
 # OLLAMA_MODEL = "llama3.2:3b" # 2GB small model
 OLLAMA_API_URL = "http://localhost:11434/api/generate"
@@ -21,6 +23,8 @@ User story:
 """
 
 def generate_user_story(problem_description):
+    if not HALLUCINATE:
+        return problem_description
     prompt = format_prompt(problem_description)
 
     payload = {
