@@ -6,7 +6,7 @@ import joblib
 from pathlib import Path
 from sentence_transformers import SentenceTransformer
 
-models_dir = Path(__file__).resolve().parent / 'models'
+models_dir = Path(__file__).resolve().parent.parent / 'models'
 
 VEC_OUT = "story_vectors.data.gz"
 META_OUT = "story_metadata.data.gz"
@@ -42,9 +42,8 @@ def get_embedding(text: str):
         print("⚠️ Warning: cleaned text is very short; returning zeros!")
         return np.zeros(size)
     reinterpreted = generate_user_story(text)
-    truncated = cleaned[:max_text_len]  # crude safety cutoff
+    truncated = reinterpreted[:max_text_len]  # crude safety cutoff
     try:
-
         emb = model.encode(truncated, normalize_embeddings=True)
         if np.all(emb == 0):  # Check if the embedding is a zero vector
             raise ValueError("Embedding is zero vector")
