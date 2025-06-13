@@ -37,7 +37,7 @@ def get_model():
 max_text_len = 1024  # arbitrary, but try 512-2048
 
 
-def get_embedding(text: str):
+def get_embedding(text: str, llm_rewrite=False):
     model, size = get_model()
     cleaned = (
         text.strip()
@@ -50,7 +50,7 @@ def get_embedding(text: str):
     if len(cleaned) < 5:  # Arbitrary length threshold
         print("⚠️ Warning: cleaned text is very short; returning zeros!")
         return np.zeros(size)
-    reinterpreted = generate_user_story(text)
+    reinterpreted = generate_user_story(text, llm_rewrite)
     truncated = reinterpreted[:max_text_len]  # crude safety cutoff
     try:
         emb = model.encode(truncated, normalize_embeddings=True)

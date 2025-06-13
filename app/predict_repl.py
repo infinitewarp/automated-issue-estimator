@@ -9,7 +9,7 @@ session = PromptSession(
 )
 
 
-def predict_repl():
+def predict_repl(force_hallucination=False):
     print(
         "\n📘 Enter a user story description. Submit with ESCAPE followed by ENTER. Ctrl+C to exit.\n"
     )
@@ -17,7 +17,7 @@ def predict_repl():
         try:
             text = session.prompt(">>> ")
             if text.strip():
-                estimate_size(text)
+                estimate_size(text, force_hallucination)
                 print()
         except (KeyboardInterrupt, EOFError):
             print("\n👋 Exiting REPL.")

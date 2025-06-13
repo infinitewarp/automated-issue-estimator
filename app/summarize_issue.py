@@ -2,6 +2,7 @@
 import json
 import requests
 from pathlib import Path
+from alive_progress import alive_bar
 
 HALLUCINATE = False  # flip this for expensive story rewriting before embedding
 # HALLUCINATE = True
@@ -50,9 +51,12 @@ def rewrite_stories_json():
     stories_path = Path("stories.json")
     with stories_path.open("r") as f:
         stories = json.load(f)
-    for story in stories:
-        story["description"] = generate_user_story(
-            story["description"], force_hallucination=True
-        )
+    with alive_bar(len(stories)) as bar:
+        for story in stories:
+            story["description"] = generate_user_story(
+                story["description"], force_hallucination=True
+            )
+            bar.text = story["id"]
+            bar()
     with stories_path.open("w", encoding="utf-8") as f:
         json.dump(stories, f, indent=2)

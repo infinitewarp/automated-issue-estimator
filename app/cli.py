@@ -1,14 +1,15 @@
 # cli.py
 import argparse
-from estimate_size import estimate_size
-from train_embeddings import train_embeddings
-from predict_repl import predict_repl
 from jira_downloader import download
+from summarize_issue import rewrite_stories_json
+from train_embeddings import train_embeddings
+from estimate_size import estimate_size
+from predict_repl import predict_repl
 
 
-def predict_once(story_text):
+def predict_once(story_text, force_hallucination=False):
     print()
-    estimate_size(story_text)
+    estimate_size(story_text, force_hallucination)
 
 
 def main():
@@ -29,20 +30,23 @@ def main():
     predict_parser.add_argument(
         "--text", type=str, help="Single prediction for given story text"
     )
+    predict_parser.add_argument(
+        "--rewrite", action="store_true", help="Rewrite input with LLM magic"
+    )
 
     args = parser.parse_args()
 
     if args.command == "getjira":
         download()
     elif args.command == "rewrite":
-        train_embeddings()
+        rewrite_stories_json()
     elif args.command == "train":
         train_embeddings()
     elif args.command == "predict":
         if args.repl:
-            predict_repl()
+            predict_repl(args.rewrite)
         elif args.text:
-            predict_once(args.text)
+            predict_once(args.text, args.rewrite)
         else:
             print("Please provide --text or --repl for predict.")
     else:

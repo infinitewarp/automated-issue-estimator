@@ -15,7 +15,7 @@ from alive_progress import alive_bar
 TOP_K = 5
 
 
-def estimate_size(user_story: str):
+def estimate_size(user_story: str, force_hallucination=False):
     with alive_bar(
         spinner="dots_waves", bar=None, monitor=False, elapsed=False, stats=False
     ):
@@ -24,7 +24,7 @@ def estimate_size(user_story: str):
         clf = load_model(MODEL_OUT)
         encoder = load_model(LABELS_OUT)
 
-        emb = get_embedding(user_story)
+        emb = get_embedding(user_story, force_hallucination)
 
         # Predict with classifier and get probability
         probs = clf.predict_proba([emb])[0]
