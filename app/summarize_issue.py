@@ -1,5 +1,7 @@
 # summarize_issue.py
+import json
 import requests
+from pathlib import Path
 
 HALLUCINATE = False  # flip this for expensive story rewriting before embedding
 # HALLUCINATE = True
@@ -25,8 +27,8 @@ User story:
 """
 
 
-def generate_user_story(problem_description):
-    if not HALLUCINATE:
+def generate_user_story(problem_description, force_hallucination=False):
+    if not (HALLUCINATE or force_hallucination):
         return problem_description
     prompt = format_prompt(problem_description)
 
@@ -42,3 +44,15 @@ def generate_user_story(problem_description):
         raise Exception(f"Error communicating with Ollama: {e}")
     except KeyError:
         raise Exception("Unexpected response format from Ollama.")
+
+
+def rewrite_stories_json():
+    stories_path = Path("stories.json")
+    with stories_path.open("r") as f:
+        stories = json.load(f)
+    for story in stories:
+        story["description"] = generate_user_story(
+            story["description"], force_hallucination=True
+        )
+    with stories_path.open("w", encoding="utf-8") as f:
+        json.dump(stories, f, indent=2)

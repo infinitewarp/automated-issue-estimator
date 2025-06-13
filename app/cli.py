@@ -3,7 +3,7 @@ import argparse
 from estimate_size import estimate_size
 from train_embeddings import train_embeddings
 from predict_repl import predict_repl
-# from update_model import update_model
+from jira_downloader import download
 
 
 def predict_once(story_text):
@@ -14,6 +14,10 @@ def predict_once(story_text):
 def main():
     parser = argparse.ArgumentParser(description="Issue Size Estimator")
     subparsers = parser.add_subparsers(dest="command")
+
+    subparsers.add_parser("getjira", help="Pull data from Jira and write stories.json")
+    subparsers.add_parser("rewrite", help="Rewrite stories.json with LLM magic")
+
     subparsers.add_parser("train", help="Train model from stories.json")
     # subparsers.add_parser("update", help="Update model with new_stories.json")
     predict_parser = subparsers.add_parser(
@@ -28,10 +32,12 @@ def main():
 
     args = parser.parse_args()
 
-    if args.command == "train":
+    if args.command == "getjira":
+        download()
+    elif args.command == "rewrite":
         train_embeddings()
-    # elif args.command == "update":
-    #     update_model()
+    elif args.command == "train":
+        train_embeddings()
     elif args.command == "predict":
         if args.repl:
             predict_repl()
